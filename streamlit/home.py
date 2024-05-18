@@ -26,9 +26,9 @@ def cargar_modelos():
     #modelo2 = load('Proyecto2_vfs_regresion_VIP.pkl')
     #modelo3 = load('Proyecto2_vfs_regresion_VIS.pkl')
     #Para que funion en streamlitCloud
-    modelo1 = load('ml_proyecto/novis.pkl')
-    modelo2 = load('ml_proyecto/vip.pkl')
-    modelo3 = load('ml_proyecto/vis.pkl')
+    modelo1 = load('novis.pkl')
+    modelo2 = load('vip.pkl')
+    modelo3 = load('vis.pkl')
     return modelo1, modelo2, modelo3
 
 def main():
