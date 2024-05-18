@@ -36,7 +36,6 @@ def main():
     Función principal para construir la aplicación Streamlit
     """
     # Título y descripción para la aplicación        
-    st.text(Path.cwd())   
     st.title("ÁREAS URBANAS BASADA EN RIESGO DE SEGURIDAD Y DEMANDA DE VIVIENDA")
     st.write("Ingrese los datos para realizar la predicción:")
 
