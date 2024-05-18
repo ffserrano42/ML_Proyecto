@@ -89,7 +89,7 @@ def main():
 
 def cargar_modelo():
     # Reemplaza 'ruta/a/modelo.pkl' con la ruta real a tu modelo de scikit-learn almacenado
-    modelo = load('./model/Proyecto2_vfs_regresionNOVIS_v2.pkl')
+    modelo = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
     return modelo
 
 if __name__ == "__main__":
