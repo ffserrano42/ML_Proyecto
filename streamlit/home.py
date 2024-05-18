@@ -2,20 +2,29 @@ import streamlit as st
 import pandas as pd
 from joblib import load
 
-def predecir(data, modelo):
+
+def predecir(data, modelos):
     """
-    Función para realizar predicciones utilizando un modelo
+    Función para realizar predicciones utilizando varios modelos
 
     Args:
         data (pandas.DataFrame): El DataFrame que contiene los datos para la predicción
-        modelo: El modelo de aprendizaje automático cargado
+        modelos (tuple): Una tupla de modelos de aprendizaje automático cargados
 
     Returns:
-        list: Una lista de valores predichos
+        list: Una lista de valores predichos por cada modelo
     """
-    # Realiza predicciones utilizando el modelo
-    predicciones = modelo.predict(data)
-    return predicciones.tolist()  # Convierte las predicciones en una lista
+    predicciones = []
+    for modelo in modelos:
+        pred = modelo.predict(data)
+        predicciones.append(pred[0])
+    return predicciones
+
+def cargar_modelos():
+    modelo1 = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
+    modelo2 = load('Proyecto2_vfs_regresion_VIP.pkl')
+    modelo3 = load('Proyecto2_vfs_regresion_VIS.pkl')
+    return modelo1, modelo2, modelo3
 
 def main():
     """
@@ -26,11 +35,11 @@ def main():
     st.write("Ingrese los datos para realizar la predicción:")
 
     try:
-        modelo = cargar_modelo()
-        st.write("¡Modelo cargado correctamente!")
+        modelos = cargar_modelos()
+        st.write("¡Modelos cargados correctamente!")
     except Exception as e:
-        st.error(f"Error al cargar el modelo: {e}")
-        return  # Salir si falla la carga del modelo
+        st.error(f"Error al cargar los modelos: {e}")
+        return
 
     with st.form(key="formulario_entrada_usuario"):
         # Campos de entrada para los datos del usuario
@@ -78,19 +87,15 @@ def main():
         df_prueba = pd.DataFrame(data_dict)
 
         # Realiza predicciones utilizando la función 'predecir'
-        predicciones = predecir(df_prueba, modelo)
-        prediccion_real = round(predicciones[0])
+        predicciones = predecir(df_prueba, modelos)
+        predicciones = [round(num) for num in predicciones]
 
         # Muestra el DataFrame de entrada del usuario como una tabla
         st.subheader("Entrada del Usuario:")
         st.table(df_prueba)  # Muestra el DataFrame como una tabla
+        st.subheader("Resultados:")
         # Muestra las predicciones
-        st.write(f"Valor Predicho: {prediccion_real}")
-
-def cargar_modelo():
-    # Reemplaza 'ruta/a/modelo.pkl' con la ruta real a tu modelo de scikit-learn almacenado
-    modelo = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
-    return modelo
+        st.table(pd.DataFrame({"Proyecto de vivienda": ["Nuevas Viviendas de Interés Social (NOVIS)","Vivienda de Interés Prioritario (VIP)","Vivienda de Interés Social (VIS)"], "Predicción": predicciones}))
 
 if __name__ == "__main__":
     main()
