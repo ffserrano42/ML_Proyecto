@@ -21,9 +21,14 @@ def predecir(data, modelos):
     return predicciones
 
 def cargar_modelos():
-    modelo1 = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
-    modelo2 = load('Proyecto2_vfs_regresion_VIP.pkl')
-    modelo3 = load('Proyecto2_vfs_regresion_VIS.pkl')
+    #Para que funcione en local
+    #modelo1 = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
+    #modelo2 = load('Proyecto2_vfs_regresion_VIP.pkl')
+    #modelo3 = load('Proyecto2_vfs_regresion_VIS.pkl')
+    #Para que funion en streamlitCloud
+    modelo1 = load('ml_proyectos/streamlit/Proyecto2_vfs_regresionNOVIS_v2.pkl')
+    modelo2 = load('ml_proyectos/streamlit/Proyecto2_vfs_regresion_VIP.pkl')
+    modelo3 = load('ml_proyectos/streamlit/Proyecto2_vfs_regresion_VIS.pkl')
     return modelo1, modelo2, modelo3
 
 def main():
