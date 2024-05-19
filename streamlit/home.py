@@ -174,6 +174,7 @@ def main():
 
         predicciones = predecir(df_prueba, modelos)
         predicciones = [round(num) for num in predicciones]
+        predicciones = [0 if num < 0 else num for num in predicciones]
         with entrada:
             st.subheader("Entrada del Usuario")
             st.table(df_prueba)
