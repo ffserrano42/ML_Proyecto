@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from joblib import load
-from pathlib import Path
+
 
 def predecir(data, modelos):
     """
@@ -20,22 +20,19 @@ def predecir(data, modelos):
         predicciones.append(pred[0])
     return predicciones
 
+
 def cargar_modelos():
-    #Para que funcione en local
-    #modelo1 = load('Proyecto2_vfs_regresionNOVIS_v2.pkl')
-    #modelo2 = load('Proyecto2_vfs_regresion_VIP.pkl')
-    #modelo3 = load('Proyecto2_vfs_regresion_VIS.pkl')
-    #Para que funion en streamlitCloud
-    modelo1 = load('streamlit/novis.pkl')
-    modelo2 = load('streamlit/vip.pkl')
-    modelo3 = load('streamlit/vis.pkl')
+    modelo1 = load("Proyecto2_vfs_regresionNOVIS_v2.pkl")
+    modelo2 = load("Proyecto2_vfs_regresion_VIP.pkl")
+    modelo3 = load("Proyecto2_vfs_regresion_VIS.pkl")
     return modelo1, modelo2, modelo3
+
 
 def main():
     """
     Función principal para construir la aplicación Streamlit
     """
-    # Título y descripción para la aplicación        
+    # Título y descripción para la aplicación
     st.title("ÁREAS URBANAS BASADA EN RIESGO DE SEGURIDAD Y DEMANDA DE VIVIENDA")
     st.write("Ingrese los datos para realizar la predicción:")
 
@@ -50,11 +47,17 @@ def main():
         # Campos de entrada para los datos del usuario
         st.write("Ingrese los datos para la predicción:")
         columnas = [
-            "LOCALIDAD", "AnimalesYMedioAmbiente",
-            "DanosYPeligrosEnPropiedadesEInfraestructuras", "EmergenciasMedicasYDeSalud",
-            "EmergenciasPorSucesosNaturales", "IncendiosYExplosiones", "NoClasificado",
-            "OtrosIncidentes", "PersonasEnSituacionDeRiesgo", "RescatesYSalvamento",
-            "SeguridadYOrdenPublico"
+            "LOCALIDAD",
+            "AnimalesYMedioAmbiente",
+            "DanosYPeligrosEnPropiedadesEInfraestructuras",
+            "EmergenciasMedicasYDeSalud",
+            "EmergenciasPorSucesosNaturales",
+            "IncendiosYExplosiones",
+            "NoClasificado",
+            "OtrosIncidentes",
+            "PersonasEnSituacionDeRiesgo",
+            "RescatesYSalvamento",
+            "SeguridadYOrdenPublico",
         ]
         labels = {
             "LOCALIDAD": "Localidad",
@@ -67,20 +70,43 @@ def main():
             "OtrosIncidentes": "Otros Incidentes",
             "PersonasEnSituacionDeRiesgo": "Personas en Situación de Riesgo",
             "RescatesYSalvamento": "Rescates y Salvamento",
-            "SeguridadYOrdenPublico": "Seguridad y Orden Público"
+            "SeguridadYOrdenPublico": "Seguridad y Orden Público",
         }
-        valores_iniciales = [0] * len(columnas)  # Inicializa con ceros para los campos de entrada
+        valores_iniciales = [0] * len(
+            columnas
+        )  # Inicializa con ceros para los campos de entrada
         entradas_usuario = []
         for i, col in enumerate(columnas):
             if col == "LOCALIDAD":
-                entrada_usuario = st.selectbox(f"Seleccione la {labels[col]}:", [
-                    "ANTONIO NARIÑO", "BARRIOS UNIDOS", "BOSA", "CANDELARIA", "CHAPINERO",
-                    "CIUDAD BOLIVAR", "ENGATIVA", "FONTIBON", "KENNEDY", "LOS MARTIRES",
-                    "PUENTE ARANDA", "RAFAEL URIBE URIBE", "SAN CRISTOBAL", "SANTA FE",
-                    "SUBA", "TEUSAQUILLO", "TUNJUELITO", "USAQUÉN", "USME"
-                ])
+                entrada_usuario = st.selectbox(
+                    f"Seleccione la {labels[col]}:",
+                    [
+                        "ANTONIO NARIÑO",
+                        "BARRIOS UNIDOS",
+                        "BOSA",
+                        "CANDELARIA",
+                        "CHAPINERO",
+                        "CIUDAD BOLIVAR",
+                        "ENGATIVA",
+                        "FONTIBON",
+                        "KENNEDY",
+                        "LOS MARTIRES",
+                        "PUENTE ARANDA",
+                        "RAFAEL URIBE URIBE",
+                        "SAN CRISTOBAL",
+                        "SANTA FE",
+                        "SUBA",
+                        "TEUSAQUILLO",
+                        "TUNJUELITO",
+                        "USAQUÉN",
+                        "USME",
+                    ],
+                )
             else:
-                entrada_usuario = st.number_input(f"Número de Incidentes de {labels[col]}:", value=valores_iniciales[i])
+                entrada_usuario = st.number_input(
+                    f"Número de Incidentes de {labels[col]}:",
+                    value=valores_iniciales[i],
+                )
             entradas_usuario.append(entrada_usuario)
 
         # Verifica si el usuario envió el formulario
@@ -100,7 +126,20 @@ def main():
         st.table(df_prueba)  # Muestra el DataFrame como una tabla
         st.subheader("Resultados:")
         # Muestra las predicciones
-        st.table(pd.DataFrame({"Proyecto de vivienda": ["Nuevas Viviendas de Interés Social (NOVIS)","Vivienda de Interés Prioritario (VIP)","Vivienda de Interés Social (VIS)"], "Predicción": predicciones}))
+        df_resultados = pd.DataFrame(
+            {
+                "Proyecto de vivienda": [
+                    "Nuevas Viviendas de Interés Social (NOVIS)",
+                    "Vivienda de Interés Prioritario (VIP)",
+                    "Vivienda de Interés Social (VIS)",
+                ],
+                "Predicción": predicciones,
+            }
+        )
+        st.table(df_resultados)
+        # Crear un histograma de los resultados
+        st.subheader("Histograma de Predicciones")
+        st.bar_chart(df_resultados.set_index("Proyecto de vivienda"))
 
 if __name__ == "__main__":
     main()
