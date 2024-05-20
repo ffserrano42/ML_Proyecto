@@ -1,15 +1,24 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from joblib import load
+import folium
+from streamlit_folium import folium_static
+import json
 
 st.set_page_config(
-    page_title="ÁREAS URBANAS BASADA EN RIESGO DE SEGURIDAD Y DEMANDA DE VIVIENDA", page_icon=":house:", layout="wide"
+    page_title="ÁREAS URBANAS BASADA EN RIESGO DE SEGURIDAD Y DEMANDA DE VIVIENDA",
+    page_icon=":house:",
+    layout="wide",
 )
 
+cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",")
+
+
 def cargar_modelos():
-    modelo1 = load("Proyecto2_vfs_regresionNOVIS_v2.pkl")
-    modelo2 = load("Proyecto2_vfs_regresion_VIP.pkl")
-    modelo3 = load("Proyecto2_vfs_regresion_VIS.pkl")
+    modelo1 = load("streamlit/Proyecto2_vfs_regresionNOVIS_v2.pkl")
+    modelo2 = load("streamlit/Proyecto2_vfs_regresion_VIP.pkl")
+    modelo3 = load("streamlit/Proyecto2_vfs_regresion_VIS.pkl")
     return modelo1, modelo2, modelo3
 
 
@@ -62,9 +71,18 @@ def mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos):
                 st.write(f"No se pueden obtener las importancias para {nombre_modelo}.")
                 continue
 
+            lassomodel = modelo['regression']
+            cat_names = modelo['transform'].transformers_[1][1].get_feature_names_out()
+            num_names = modelo['transform'].transformers_[0][2]
+            col_names =list(cat_names)
+            coef = list(zip(['Intercepto'] + list(col_names), [lassomodel.intercept_] + list(lassomodel.coef_)))
+            coef = pd.DataFrame(coef,columns=['Variable','Parámetro'])
+            coef.sort_values('Parámetro')
+            coef_dict = dict(zip(coef['Variable'], coef['Parámetro']))
             importancias_dict = dict(
                 zip([labels[col] for col in columnas[1:]], importancias)
             )
+            importancias_dict.update(coef_dict)
             data[nombre_modelo] = importancias_dict
 
         except Exception as e:
@@ -74,6 +92,14 @@ def mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos):
 
     df = pd.DataFrame(data)
     st.write(df)
+
+
+# Función para buscar por codigo_upz
+def buscar_por_codigo_upz(data, codigo_upz):
+    for item in data:
+        if item.get("codigo_upz") == codigo_upz:
+            return item
+    return None
 
 
 def main():
@@ -163,9 +189,84 @@ def main():
         "Vivienda de Interés Prioritario (VIP)",
         "Vivienda de Interés Social (VIS)",
     ]
-    pesos, entrada, resultados = \
-        st.tabs(["Importancia de las Variables", "Parámetros de Entrada", "Resultados"])
-    
+    pesos, entrada, resultados, mapa = st.tabs(
+        ["Importancia de las Variables", "Parámetros de Entrada", "Resultados", "Mapa"]
+    )
+    with mapa:
+
+        with open("streamlit/upz-bogota.json", "r") as f:
+            data = json.load(f)
+
+        anhos = cluster_df["ANIO"].unique()
+        anho = st.slider(
+            "Selecciona un año",
+            min_value=int(anhos.min()),
+            max_value=int(anhos.max()),
+            value=int(anhos.min()),
+        )
+        meses = cluster_df["MES"].unique()
+        mes = st.slider(
+            "Selecciona un mes",
+            min_value=int(meses.min()),
+            max_value=int(meses.max()),
+            value=int(meses.min()),
+        )
+        map_df = cluster_df[(cluster_df["ANIO"] == anho) & (cluster_df["MES"] == mes)]
+
+        m = folium.Map(
+            location=[data[0]["geo_point_2d"]["lat"], data[0]["geo_point_2d"]["lon"]],
+            zoom_start=11,
+        )
+
+        geo_data = {"type": "FeatureCollection", "features": []}
+
+        for index, row in map_df.iterrows():
+            upz = buscar_por_codigo_upz(data, row["COD_UPZ"])
+            if upz:
+                obj = {
+                    "type": "Feature",
+                    "properties": {
+                        "Localidad": row["LOCALIDAD"],
+                        "UPZ": upz["nombre"],
+                        "Cluster": row["Cluster"],
+                    },
+                    "geometry": {
+                        "type": upz["geo_shape"]["geometry"]["type"],
+                        "coordinates": upz["geo_shape"]["geometry"]["coordinates"],
+                    },
+                }
+                geo_data["features"].append(obj)
+
+        folium.GeoJson(
+            geo_data,
+            name="Mapa",
+            style_function=lambda x: {
+                "fillColor": (
+                    "#114c5f"
+                    if x["properties"]["Cluster"] == 0
+                    else ("#4a6eb0" if x["properties"]["Cluster"] == 1 else "#0799b6")
+                ),
+                "color": "#eee",
+                "fillOpacity": 0.5,
+                "dashArray": "5, 5",
+                "weight": 1
+            },
+            tooltip=folium.GeoJsonTooltip(
+                # fields=["Localidad", "UPZ", "Cluster", "NOVIS", "VIP", "VIS"],
+                fields=["Localidad", "UPZ", "Cluster", "Cluster", "Cluster", "Cluster"],
+                aliases=[
+                    "Localidad",
+                    "UPZ",
+                    "Cluster",
+                    "Nuevas Viviendas de Interés Social (NOVIS)",
+                    "Vivienda de Interés Prioritario (VIP)",
+                    "Vivienda de Interés Social (VIS)",
+                ],
+            ),
+        ).add_to(m)
+
+        folium_static(m)
+
     with pesos:
         mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos)
     if boton_prediccion:
@@ -178,7 +279,7 @@ def main():
         with entrada:
             st.subheader("Entrada del Usuario")
             st.table(df_prueba)
-        
+
         with resultados:
             st.subheader("Resultados")
             df_resultados = pd.DataFrame(
@@ -190,6 +291,7 @@ def main():
             st.table(df_resultados)
             st.subheader("Histograma de Predicciones")
             st.bar_chart(df_resultados.set_index("Proyecto de vivienda"))
+
 
 if __name__ == "__main__":
     main()
