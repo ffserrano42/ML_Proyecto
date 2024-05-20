@@ -81,7 +81,7 @@ def mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos):
             importancias_dict = dict(
                 zip([labels[col] for col in columnas[1:]], importancias)
             )
-            importancias_dict.update(coef_dict)
+            # importancias_dict.update(coef_dict)
             data[nombre_modelo] = importancias_dict
 
         except Exception as e:
