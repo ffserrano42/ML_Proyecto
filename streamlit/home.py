@@ -12,8 +12,7 @@ st.set_page_config(
     layout="wide",
 )
 
-cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",")
-
+cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",", encoding='latin1')
 
 def cargar_modelos():
     modelo1 = load("streamlit/Proyecto2_vfs_regresionNOVIS_v2.pkl")
@@ -229,6 +228,9 @@ def main():
                         "Localidad": row["LOCALIDAD"],
                         "UPZ": upz["nombre"],
                         "Cluster": row["Cluster"],
+                        "NOVIS": row["NOVIS"],
+                        "VIP": row["VIP"],
+                        "VIS": row["VIS"],
                     },
                     "geometry": {
                         "type": upz["geo_shape"]["geometry"]["type"],
@@ -252,8 +254,7 @@ def main():
                 "weight": 1
             },
             tooltip=folium.GeoJsonTooltip(
-                # fields=["Localidad", "UPZ", "Cluster", "NOVIS", "VIP", "VIS"],
-                fields=["Localidad", "UPZ", "Cluster", "Cluster", "Cluster", "Cluster"],
+                fields=["Localidad", "UPZ", "Cluster", "NOVIS", "VIP", "VIS"],
                 aliases=[
                     "Localidad",
                     "UPZ",
