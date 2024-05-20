@@ -16,10 +16,6 @@ cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",")
 
 
 def cargar_modelos():
-    #modelo1 = load("Proyecto2_vfs_regresionNOVIS_v2.pkl")
-    #modelo2 = load("Proyecto2_vfs_regresion_VIP.pkl")
-    #modelo3 = load("Proyecto2_vfs_regresion_VIS.pkl")
-    #cargar en streamlit
     modelo1 = load("streamlit/Proyecto2_vfs_regresionNOVIS_v2.pkl")
     modelo2 = load("streamlit/Proyecto2_vfs_regresion_VIP.pkl")
     modelo3 = load("streamlit/Proyecto2_vfs_regresion_VIS.pkl")
