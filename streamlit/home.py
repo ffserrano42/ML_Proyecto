@@ -70,14 +70,14 @@ def mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos):
                 st.write(f"No se pueden obtener las importancias para {nombre_modelo}.")
                 continue
 
-            lassomodel = modelo['regression']
-            cat_names = modelo['transform'].transformers_[1][1].get_feature_names_out()
-            num_names = modelo['transform'].transformers_[0][2]
-            col_names =list(cat_names)
-            coef = list(zip(['Intercepto'] + list(col_names), [lassomodel.intercept_] + list(lassomodel.coef_)))
-            coef = pd.DataFrame(coef,columns=['Variable','Parámetro'])
-            coef.sort_values('Parámetro')
-            coef_dict = dict(zip(coef['Variable'], coef['Parámetro']))
+            # lassomodel = modelo['regression']
+            # cat_names = modelo['transform'].transformers_[1][1].get_feature_names_out()
+            # num_names = modelo['transform'].transformers_[0][2]
+            # col_names =list(cat_names)
+            # coef = list(zip(['Intercepto'] + list(col_names), [lassomodel.intercept_] + list(lassomodel.coef_)))
+            # coef = pd.DataFrame(coef,columns=['Variable','Parámetro'])
+            # coef.sort_values('Parámetro')
+            # coef_dict = dict(zip(coef['Variable'], coef['Parámetro']))
             importancias_dict = dict(
                 zip([labels[col] for col in columnas[1:]], importancias)
             )
