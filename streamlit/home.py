@@ -12,7 +12,8 @@ st.set_page_config(
     layout="wide",
 )
 
-cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",", encoding='latin1')
+cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",", encoding="latin1")
+
 
 def cargar_modelos():
     modelo1 = load("streamlit/Proyecto2_vfs_regresionNOVIS_v2.pkl")
@@ -70,14 +71,19 @@ def mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos):
                 st.write(f"No se pueden obtener las importancias para {nombre_modelo}.")
                 continue
 
-            lassomodel = modelo['regression']
-            cat_names = modelo['transform'].transformers_[1][1].get_feature_names_out()
-            num_names = modelo['transform'].transformers_[0][2]
-            col_names =list(cat_names)
-            coef = list(zip(['Intercepto'] + list(col_names), [lassomodel.intercept_] + list(lassomodel.coef_)))
-            coef = pd.DataFrame(coef,columns=['Variable','Parámetro'])
-            coef.sort_values('Parámetro')
-            coef_dict = dict(zip(coef['Variable'], coef['Parámetro']))
+            lassomodel = modelo["regression"]
+            cat_names = modelo["transform"].transformers_[1][1].get_feature_names_out()
+            num_names = modelo["transform"].transformers_[0][2]
+            col_names = list(cat_names)
+            coef = list(
+                zip(
+                    ["Intercepto"] + list(col_names),
+                    [lassomodel.intercept_] + list(lassomodel.coef_),
+                )
+            )
+            coef = pd.DataFrame(coef, columns=["Variable", "Parámetro"])
+            coef.sort_values("Parámetro")
+            coef_dict = dict(zip(coef["Variable"], coef["Parámetro"]))
             importancias_dict = dict(
                 zip([labels[col] for col in columnas[1:]], importancias)
             )
@@ -231,6 +237,23 @@ def main():
                         "NOVIS": row["NOVIS"],
                         "VIP": row["VIP"],
                         "VIS": row["VIS"],
+                        "AccidentesDeTransito": row["AccidentesDeTransito"],
+                        "DanosYPeligrosEnPropiedadesEInfraestructuras": row[
+                            "DanosYPeligrosEnPropiedadesEInfraestructuras"
+                        ],
+                        "PersonasEnSituacionDeRiesgo": row[
+                            "PersonasEnSituacionDeRiesgo"
+                        ],
+                        "SeguridadYOrdenPublico": row["SeguridadYOrdenPublico"],
+                        "IncendiosYExplosiones": row["IncendiosYExplosiones"],
+                        "RescatesYSalvamento": row["RescatesYSalvamento"],
+                        "AnimalesYMedioAmbiente": row["AnimalesYMedioAmbiente"],
+                        "EmergenciasMedicasYDeSalud": row["EmergenciasMedicasYDeSalud"],
+                        "EmergenciasPorSucesosNaturales": row[
+                            "EmergenciasPorSucesosNaturales"
+                        ],
+                        "NoClasificado": row["NoClasificado"],
+                        "OtrosIncidentes": row["OtrosIncidentes"],
                     },
                     "geometry": {
                         "type": upz["geo_shape"]["geometry"]["type"],
@@ -251,10 +274,28 @@ def main():
                 "color": "#eee",
                 "fillOpacity": 0.5,
                 "dashArray": "5, 5",
-                "weight": 1
+                "weight": 1,
             },
             tooltip=folium.GeoJsonTooltip(
-                fields=["Localidad", "UPZ", "Cluster", "NOVIS", "VIP", "VIS"],
+                fields=[
+                    "Localidad",
+                    "UPZ",
+                    "Cluster",
+                    "NOVIS",
+                    "VIP",
+                    "VIS",
+                    "AccidentesDeTransito",
+                    "DanosYPeligrosEnPropiedadesEInfraestructuras",
+                    "PersonasEnSituacionDeRiesgo",
+                    "SeguridadYOrdenPublico",
+                    "IncendiosYExplosiones",
+                    "RescatesYSalvamento",
+                    "AnimalesYMedioAmbiente",
+                    "EmergenciasMedicasYDeSalud",
+                    "EmergenciasPorSucesosNaturales",
+                    "NoClasificado",
+                    "OtrosIncidentes"
+                ],
                 aliases=[
                     "Localidad",
                     "UPZ",
@@ -262,11 +303,22 @@ def main():
                     "Nuevas Viviendas de Interés Social (NOVIS)",
                     "Vivienda de Interés Prioritario (VIP)",
                     "Vivienda de Interés Social (VIS)",
+                    "Media de Accidentes de Tránsito",
+                    "Media de Daños y Peligros en Propiedades e Infraestructuras",
+                    "Media de Personas en Situación de Riesgo",
+                    "Media de Seguridad y Orden Público",
+                    "Media de Incendios y Explosiones",
+                    "Media de Rescates y Salvamento",
+                    "Media de Animales y Medio Ambiente",
+                    "Media de Emergencias Médicas y de Salud",
+                    "Media de Emergencias por Sucesos Naturales",
+                    "Media de No Clasificado",
+                    "Media de Otros Incidentes"
                 ],
             ),
         ).add_to(m)
 
-        folium_static(m)
+        folium_static(m,width=1200, height=800)
 
     with pesos:
         mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos)
