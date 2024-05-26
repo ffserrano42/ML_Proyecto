@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide",
 )
 
-cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",", encoding="latin1")
+cluster_df = pd.read_csv("streamlit/cluster_data.csv", sep=",")
 
 
 def cargar_modelos():
@@ -237,23 +237,35 @@ def main():
                         "NOVIS": row["NOVIS"],
                         "VIP": row["VIP"],
                         "VIS": row["VIS"],
-                        "AccidentesDeTransito": row["AccidentesDeTransito"],
-                        "DanosYPeligrosEnPropiedadesEInfraestructuras": row[
-                            "DanosYPeligrosEnPropiedadesEInfraestructuras"
-                        ],
-                        "PersonasEnSituacionDeRiesgo": row[
-                            "PersonasEnSituacionDeRiesgo"
-                        ],
-                        "SeguridadYOrdenPublico": row["SeguridadYOrdenPublico"],
-                        "IncendiosYExplosiones": row["IncendiosYExplosiones"],
-                        "RescatesYSalvamento": row["RescatesYSalvamento"],
-                        "AnimalesYMedioAmbiente": row["AnimalesYMedioAmbiente"],
-                        "EmergenciasMedicasYDeSalud": row["EmergenciasMedicasYDeSalud"],
-                        "EmergenciasPorSucesosNaturales": row[
-                            "EmergenciasPorSucesosNaturales"
-                        ],
-                        "NoClasificado": row["NoClasificado"],
-                        "OtrosIncidentes": row["OtrosIncidentes"],
+                        "mean_AccidentesDeTransito": round(
+                            row["mean_AccidentesDeTransito"]
+                        ),
+                        "mean_DanosYPeligrosEnPropiedadesEInfraestructuras": round(
+                            row["mean_DanosYPeligrosEnPropiedadesEInfraestructuras"]
+                        ),
+                        "mean_PersonasEnSituacionDeRiesgo": round(
+                            row["mean_PersonasEnSituacionDeRiesgo"]
+                        ),
+                        "mean_SeguridadYOrdenPublico": round(
+                            row["mean_SeguridadYOrdenPublico"]
+                        ),
+                        "mean_IncendiosYExplosiones": round(
+                            row["mean_IncendiosYExplosiones"]
+                        ),
+                        "mean_RescatesYSalvamento": round(
+                            row["mean_RescatesYSalvamento"]
+                        ),
+                        "mean_AnimalesYMedioAmbiente": round(
+                            row["mean_AnimalesYMedioAmbiente"]
+                        ),
+                        "mean_EmergenciasMedicasYDeSalud": round(
+                            row["mean_EmergenciasMedicasYDeSalud"]
+                        ),
+                        "mean_EmergenciasPorSucesosNaturales": round(
+                            row["mean_EmergenciasPorSucesosNaturales"]
+                        ),
+                        "mean_NoClasificado": round(row["mean_NoClasificado"]),
+                        "mean_OtrosIncidentes": round(row["mean_OtrosIncidentes"]),
                     },
                     "geometry": {
                         "type": upz["geo_shape"]["geometry"]["type"],
@@ -284,17 +296,17 @@ def main():
                     "NOVIS",
                     "VIP",
                     "VIS",
-                    "AccidentesDeTransito",
-                    "DanosYPeligrosEnPropiedadesEInfraestructuras",
-                    "PersonasEnSituacionDeRiesgo",
-                    "SeguridadYOrdenPublico",
-                    "IncendiosYExplosiones",
-                    "RescatesYSalvamento",
-                    "AnimalesYMedioAmbiente",
-                    "EmergenciasMedicasYDeSalud",
-                    "EmergenciasPorSucesosNaturales",
-                    "NoClasificado",
-                    "OtrosIncidentes"
+                    "mean_AccidentesDeTransito",
+                    "mean_DanosYPeligrosEnPropiedadesEInfraestructuras",
+                    "mean_PersonasEnSituacionDeRiesgo",
+                    "mean_SeguridadYOrdenPublico",
+                    "mean_IncendiosYExplosiones",
+                    "mean_RescatesYSalvamento",
+                    "mean_AnimalesYMedioAmbiente",
+                    "mean_EmergenciasMedicasYDeSalud",
+                    "mean_EmergenciasPorSucesosNaturales",
+                    "mean_NoClasificado",
+                    "mean_OtrosIncidentes",
                 ],
                 aliases=[
                     "Localidad",
@@ -313,12 +325,12 @@ def main():
                     "Media de Emergencias Médicas y de Salud",
                     "Media de Emergencias por Sucesos Naturales",
                     "Media de No Clasificado",
-                    "Media de Otros Incidentes"
+                    "Media de Otros Incidentes",
                 ],
             ),
         ).add_to(m)
 
-        folium_static(m,width=1200, height=800)
+        folium_static(m, width=1200, height=800)
 
     with pesos:
         mostrar_pesos_modelos(modelos, columnas, labels, labels_modelos)
